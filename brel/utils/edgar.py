@@ -6,7 +6,10 @@ The module also provides a function for listing all filings for a given CIK and 
 """
 
 from brel import Filing
-import requests, json, os, datetime
+import requests
+import json
+import os
+import datetime
 
 SUPPORTED_FILING_TYPES = ["10-K", "10-Q", "8-K"]
 
@@ -123,12 +126,14 @@ def open_edgar(cik: str, filing_type: str, date: str | None = None) -> Filing:
         def report_fits(i: int) -> bool:
             is_right_type = recent["form"][i] == filing_type
             is_xbrl = str(recent["isXBRL"][i]) == "1"
-            is_right_date = date is None or recent["reportDate"][i] == date
+            is_right_date = date is None or recent["filingDate"][i] == date
             return is_right_type and is_xbrl and is_right_date
 
         right_is = [i for i in range(len(recent["form"])) if report_fits(i)]
 
-        right_is.sort(key=lambda i: int(recent["reportDate"][i].replace("-", "")), reverse=True)
+        right_is.sort(
+            key=lambda i: int(recent["filingDate"][i].replace("-", "")), reverse=True
+        )
 
         right_i = right_is[0] if len(right_is) > 0 else None
 
@@ -150,5 +155,7 @@ def open_edgar(cik: str, filing_type: str, date: str | None = None) -> Filing:
                 raise ValueError(
                     f"Failed to download filing from {uri}. Note that the Brel does not support .htm filings and that it cannot scrape EDGAR's website. We suggest that you search for the .xml filing on {uri_dir} and call brel.Filing.open(uri) with the correct URI."
                 )
-        print(f"Opening {filing_type} filing of {metadata['name']} ({cik}) on {recent['reportDate'][right_i]}")
+        print(
+            f"Opening {filing_type} filing of {metadata['name']} ({cik}) on {recent['filingDate'][right_i]}"
+        )
         return Filing.open(uri)
