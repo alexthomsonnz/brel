@@ -314,9 +314,14 @@ class QNameNSMap:
                 f"Invalid prefix redirect: {redirect_to}. The redirect destination does not exist in the namespace map"
             )
         if redirect_from in self.__prefix_to_url:
-            raise ValueError(
-                f"Invalid prefix redirect: {redirect_from}. The redirect source already exists in the namespace map"
-            )
+            if redirect_to in self.__prefix_to_url:
+                # This redirect references another prefix url.
+                # patch for a XOM 2011 10-Q
+                redirect_to = self.__prefix_to_url[redirect_to]
+            else:
+                raise ValueError(
+                    f"Invalid prefix redirect: {redirect_from}. The redirect source already exists in the namespace map"
+                )
         self.__prefix_redirects[redirect_from] = redirect_to
 
     def get_redirect(self, redirect_from: str) -> str | None:
