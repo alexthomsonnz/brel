@@ -15,9 +15,9 @@ To print a fact to the console, use the `pprint` function in the `brel` module.
 ====================
 """
 
-from typing import Any, cast
+from typing import cast
 
-from brel import Context, QName
+from brel import Context
 from brel.characteristics import (
     Aspect,
     ConceptCharacteristic,
@@ -25,6 +25,7 @@ from brel.characteristics import (
     PeriodCharacteristic,
     UnitCharacteristic,
     EntityCharacteristic,
+    ExplicitDimensionCharacteristic,
 )
 
 
@@ -135,7 +136,9 @@ class Fact:
         :returns UnitCharacteristic|None: The unit characteristic of the facts context. Returns None if the fact does not have a unit.
         Equivalent to calling `fact.get_context().get_unit()`
         """
-        unit: UnitCharacteristic = cast(UnitCharacteristic, self.__context.get_characteristic(Aspect.UNIT))
+        unit: UnitCharacteristic = cast(
+            UnitCharacteristic, self.__context.get_characteristic(Aspect.UNIT)
+        )
         return unit
 
     def get_period(self) -> PeriodCharacteristic | None:
@@ -175,3 +178,15 @@ class Fact:
         Equivalent to calling `fact.get_context().get_characteristic(aspect)`
         """
         return self.__context.get_characteristic(aspect)
+
+    def get_characteristics(self) -> dict[Aspect, ICharacteristic]:
+        """
+        :returns list[ICharacteristic]: The characteristics of the facts context.
+        Equivalent to calling `fact.get_context().__characteristics`
+        """
+        return self.get_context().get_characteristics()
+
+    def get_explicit_dimension_characteristic(
+        self,
+    ) -> ExplicitDimensionCharacteristic | None:
+        return self.get_context().get_explicit_dimension_characteristic()

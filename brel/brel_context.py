@@ -20,7 +20,7 @@ In the example above, the aspects are Entity, Period, Concept and Unit.
 Characteristics are aspect-value pairs.
 So for example, the characteristic of the Entity aspect would be "Foo Corporation".
 
-Read more about Aspects and Characteristics in 
+Read more about Aspects and Characteristics in
 
 ====================
 
@@ -40,6 +40,7 @@ from brel.characteristics import (
     ICharacteristic,
     PeriodCharacteristic,
     UnitCharacteristic,
+    ExplicitDimensionCharacteristic,
 )
 
 
@@ -134,6 +135,22 @@ class Context:
         :returns UnitCharacteristic|None: The unit of the context. None if the context does not have a unit.
         """
         return cast(UnitCharacteristic, self.get_characteristic(Aspect.UNIT))
+
+    def get_characteristics(self) -> dict[Aspect, ICharacteristic]:
+        return self.__characteristics
+
+    def get_explicit_dimension_characteristic(
+        self,
+    ) -> ExplicitDimensionCharacteristic | None:
+        """
+        Get the explicit dimension characteristic of the context.
+        This function is equivalent to `get_characteristic(Aspect.DIMENSION)`.
+        :returns ExplicitDimensionCharacteristic|None: The explicit dimension characteristic of the context. None if the context does not have an explicit dimension.
+        """
+        for characteristic in self.__characteristics.values():
+            if isinstance(characteristic, ExplicitDimensionCharacteristic):
+                return cast(ExplicitDimensionCharacteristic, characteristic)
+        return None
 
     # Internal methods
     def _add_characteristic(self, characteristic: ICharacteristic) -> None:
